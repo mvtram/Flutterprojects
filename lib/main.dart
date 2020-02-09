@@ -1,57 +1,67 @@
 import 'package:flutter/material.dart';
 import 'package:english_words/english_words.dart';
 
-void main() => runApp(MyApp());
 
-class MyApp extends StatelessWidget {
+/* GESTURE BUTTON PRACTICE */
+
+void main() {
+  runApp(MaterialApp(
+    title: 'new flutter app',
+    home: TutorialHome(),
+  ));
+}
+
+
+class MyButton extends StatelessWidget {
+  
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Startup Name Generator',
-      home: RandomWords(),
+    return GestureDetector(
+      onTap: (){
+        print('My button was tapped');
+      },
+      child: Container(
+        height: 36.0,
+        padding: EdgeInsets.all(8.0),
+        margin: EdgeInsets.symmetric(horizontal: 8.0),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(5.0),
+          color: Colors.lightGreen[500],
+        ),
+        child: Center(
+          child: Text('engage')
+        ),
+      )
+      
     );
   }
 }
 
-class _RandomWordsState extends State<RandomWords> {
-  final _suggestions = <WordPair>[];
-  final _biggerFont = const TextStyle(fontSize: 18.0);
+
+class TutorialHome extends StatelessWidget {
+ 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('startup name generator'),
+        leading: IconButton(
+          icon: Icon(Icons.menu),
+          tooltip: 'navigation menu', 
+          onPressed: null),
+        title: Text('Example flutter project'),
+        actions: <Widget>[
+          IconButton(icon: Icon(Icons.search),tooltip: 'search', onPressed: null) 
+        ],
       ),
-      body: _buildSuggestions(),
+
+      body: MyButton(),
+
+      floatingActionButton: FloatingActionButton(
+        child: Icon(Icons.add),
+        tooltip: 'add',
+        onPressed: null
+        ),
+
     );
   }
-
-  Widget _buildRow(WordPair pair) {
-    return ListTile(
-      title: Text(
-        pair.asPascalCase,
-        style: _biggerFont,
-      ),
-    );
-  }
-
-  Widget _buildSuggestions() {
-    return ListView.builder(
-        padding: EdgeInsets.all(16.0),
-        itemBuilder: (context, i) {
-          if (i.isOdd) {
-            return Divider();
-          }
-          final index = i ~/ 2;
-          if (index >= _suggestions.length) {
-            _suggestions.addAll(generateWordPairs().take(10));
-          }
-          return _buildRow(_suggestions[index]);
-        });
-  }
-}
-
-class RandomWords extends StatefulWidget {
-  @override
-  _RandomWordsState createState() => _RandomWordsState();
 }
