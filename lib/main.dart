@@ -1,57 +1,63 @@
 import 'package:flutter/material.dart';
-import 'package:english_words/english_words.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'dart:async';
 
-void main() => runApp(MyApp());
+void main() => runApp(new MaterialApp(
+      home: new HomePage(),
+    ));
 
-class MyApp extends StatelessWidget {
+class HomePage extends StatefulWidget {
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Startup Name Generator',
-      home: RandomWords(),
-    );
-  }
+  HomePageState createState() => HomePageState();
 }
 
-class _RandomWordsState extends State<RandomWords> {
-  final _suggestions = <WordPair>[];
-  final _biggerFont = const TextStyle(fontSize: 18.0);
+class HomePageState extends State<HomePage> {
+  final String url = "https://swapi.co/api/people/";
+  List data;
+
+  @override
+  void initState() {
+    super.initState();
+    this.getJsonData();
+  }
+
+  Future<String> getJsonData() async {
+    var response = await http
+        .get(Uri.encodeFull(url), headers: {"Accept": "application/json"});
+
+    print(response.body);
+
+    setState(() {
+      var toJsonData = json.decode(response.body);
+      data = toJsonData['results'];
+    });
+
+    return "Success";
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('startup name generator'),
-      ),
-      body: _buildSuggestions(),
-    );
+    // TODO: implement build
+    return new Scaffold(
+        appBar: new AppBar(
+          title: new Text("GET API"),
+        ),
+        body: new ListView.builder(
+            itemCount: data == null ? 0 : data.length,
+            itemBuilder: (BuildContext context, int index) {
+              return new Container(
+                  child: new Center(
+                      child: new Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: <Widget>[
+                  new Card(
+                      child: new Container(
+                    child: new Text(data[index]['name']),
+                    padding: const EdgeInsets.all(20),
+                  ))
+                ],
+              )));
+            }));
   }
-
-  Widget _buildRow(WordPair pair) {
-    return ListTile(
-      title: Text(
-        pair.asPascalCase,
-        style: _biggerFont,
-      ),
-    );
-  }
-
-  Widget _buildSuggestions() {
-    return ListView.builder(
-        padding: EdgeInsets.all(16.0),
-        itemBuilder: (context, i) {
-          if (i.isOdd) {
-            return Divider();
-          }
-          final index = i ~/ 2;
-          if (index >= _suggestions.length) {
-            _suggestions.addAll(generateWordPairs().take(10));
-          }
-          return _buildRow(_suggestions[index]);
-        });
-  }
-}
-
-class RandomWords extends StatefulWidget {
-  @override
-  _RandomWordsState createState() => _RandomWordsState();
 }
